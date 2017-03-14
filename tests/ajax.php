@@ -228,10 +228,14 @@ class Tests_AJAX extends WP_UnitTestCase {
 
 		delete_transient( '_edd_ajax_works' );
 
+		/*
+		 * Commented out - PHP reports class declarations may not be nested
 		class Airplane_Mode_Core {
 			function __construct() {}
-			public function enabled() { return true }
+			public function enabled() { return true; }
 		}
+		*/
+		
 
 		global $Airplane_Mode_Core;
 		$Airplane_Mode_Core = new Airplane_Mode_Core;
