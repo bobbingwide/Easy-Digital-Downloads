@@ -24,6 +24,20 @@ function edd_is_test_mode() {
 }
 
 /**
+ * Is Debug Mode
+ *
+ * @since 2.8.7
+ * @return bool $ret True if debug mode is enabled, false otherwise
+ */
+function edd_is_debug_mode() {
+	$ret = edd_get_option( 'debug_mode', false );
+	if( defined( 'EDD_DEBUG_MODE' ) && EDD_DEBUG_MODE ) {
+		$ret = true;
+	}
+	return (bool) apply_filters( 'edd_is_debug_mode', $ret );
+}
+
+/**
  * Checks if Guest checkout is enabled
  *
  * @since 1.0
@@ -329,7 +343,8 @@ function edd_get_currencies() {
 		'INR'  => __( 'Indian Rupee (&#8377;)', 'easy-digital-downloads' ),
 		'TRY'  => __( 'Turkish Lira (&#8378;)', 'easy-digital-downloads' ),
 		'RIAL' => __( 'Iranian Rial (&#65020;)', 'easy-digital-downloads' ),
-		'RUB'  => __( 'Russian Rubles', 'easy-digital-downloads' )
+		'RUB'  => __( 'Russian Rubles', 'easy-digital-downloads' ),
+		'AOA'  => __( 'Angolan Kwanza', 'easy-digital-downloads' ),
 	);
 
 	return apply_filters( 'edd_currencies', $currencies );
@@ -380,6 +395,9 @@ function edd_currency_symbol( $currency = '' ) {
 			break;
 		case "JPY" :
 			$symbol = '&yen;';
+			break;
+		case "AOA" :
+			$symbol = 'Kz';
 			break;
 		default :
 			$symbol = $currency;
@@ -592,7 +610,7 @@ function edd_is_func_disabled( $function ) {
  * @author Chris Christoff
  *
  * @param unknown $v
- * @return int|string
+ * @return int
  */
 function edd_let_to_num( $v ) {
 	$l   = substr( $v, -1 );
@@ -610,7 +628,7 @@ function edd_let_to_num( $v ) {
 			break;
 	}
 
-	return $ret;
+	return (int) $ret;
 }
 
 /**
@@ -881,7 +899,7 @@ if ( ! function_exists( 'getallheaders' ) ) :
 	 * @return array
 	 */
 	function getallheaders() {
-		$headers = '';
+		$headers = array();
 		foreach ( $_SERVER as $name => $value ) {
 			if ( substr( $name, 0, 5 ) == 'HTTP_' ) {
 				$headers[ str_replace( ' ', '-', ucwords( strtolower( str_replace( '_', ' ', substr( $name, 5 ) ) ) ) ) ] = $value;

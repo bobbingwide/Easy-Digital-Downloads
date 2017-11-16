@@ -246,7 +246,7 @@ function edd_get_cc_form() {
 				<span class="card-type"></span>
 			</label>
 			<span class="edd-description"><?php _e( 'The (typically) 16 digits on the front of your credit card.', 'easy-digital-downloads' ); ?></span>
-			<input type="tel" pattern="[0-9]{13,16}" autocomplete="off" name="card_number" id="card_number" class="card-number edd-input required" placeholder="<?php _e( 'Card number', 'easy-digital-downloads' ); ?>" />
+			<input type="tel" pattern="^[0-9!@#$%^&* ]*$" autocomplete="off" name="card_number" id="card_number" class="card-number edd-input required" placeholder="<?php _e( 'Card number', 'easy-digital-downloads' ); ?>" />
 		</p>
 		<p id="edd-card-cvc-wrap">
 			<label for="card_cvc" class="edd-label">
@@ -745,8 +745,10 @@ function edd_discount_field() {
 					<?php _e( 'Discount', 'easy-digital-downloads' ); ?>
 				</label>
 				<span class="edd-description"><?php _e( 'Enter a coupon code if you have one.', 'easy-digital-downloads' ); ?></span>
-				<input class="edd-input" type="text" id="edd-discount" name="edd-discount" placeholder="<?php _e( 'Enter discount', 'easy-digital-downloads' ); ?>"/>
-				<input type="submit" class="edd-apply-discount edd-submit button <?php echo $color . ' ' . $style; ?>" value="<?php echo _x( 'Apply', 'Apply discount at checkout', 'easy-digital-downloads' ); ?>"/>
+				<span class="edd-discount-code-field-wrap">
+					<input class="edd-input" type="text" id="edd-discount" name="edd-discount" placeholder="<?php _e( 'Enter discount', 'easy-digital-downloads' ); ?>"/>
+					<input type="submit" class="edd-apply-discount edd-submit button <?php echo $color . ' ' . $style; ?>" value="<?php echo _x( 'Apply', 'Apply discount at checkout', 'easy-digital-downloads' ); ?>"/>
+				</span>
 				<span class="edd-discount-loader edd-loading" id="edd-discount-loader" style="display:none;"></span>
 				<span id="edd-discount-error-wrap" class="edd_error edd-alert edd-alert-error" aria-hidden="true" style="display:none;"></span>
 			</p>
@@ -768,6 +770,8 @@ function edd_terms_agreement() {
 	if ( edd_get_option( 'show_agree_to_terms', false ) ) {
 		$agree_text  = edd_get_option( 'agree_text', '' );
 		$agree_label = edd_get_option( 'agree_label', __( 'Agree to Terms?', 'easy-digital-downloads' ) );
+		
+		ob_start();
 ?>
 		<fieldset id="edd_terms_agreement">
 			<div id="edd_terms" style="display:none;">
@@ -787,6 +791,9 @@ function edd_terms_agreement() {
 			</div>
 		</fieldset>
 <?php
+		$html_output = ob_get_clean();
+
+		echo apply_filters( 'edd_checkout_terms_agreement_html', $html_output );
 	}
 }
 add_action( 'edd_purchase_form_before_submit', 'edd_terms_agreement' );

@@ -425,10 +425,28 @@ class Tests_Discounts extends EDD_UnitTestCase {
 		edd_add_to_cart( $download_3->ID );
 		$this->assertTrue( edd_discount_is_min_met( $discount ) );
 
+		$discount_obj = edd_get_discount( $discount );
+		$this->assertFalse( edd_is_discount_valid( $discount_obj->code ) );
+
 		EDD_Helper_Download::delete_download( $download_1->ID );
 		EDD_Helper_Download::delete_download( $download_2->ID );
 		EDD_Helper_Download::delete_download( $download_3->ID );
 		EDD_Helper_Discount::delete_discount( $discount );
 	}
 
+	public function test_edd_get_discounts() {
+		$defaults = array(
+			'post_type'      => 'edd_discount',
+			'posts_per_page' => 30,
+			'paged'          => null,
+			'post_status'    => array( 'active', 'inactive', 'expired' )
+		);
+
+		$hash            = md5( json_encode( $defaults ) );
+		$found_discounts = edd_get_discounts();
+
+		$this->assertSame( 3, count( $found_discounts ) );
+		global $edd_get_discounts_cache;
+		$this->assertSame( $found_discounts, $edd_get_discounts_cache[ $hash ] );
+	}
 }

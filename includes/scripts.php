@@ -39,13 +39,19 @@ function edd_load_scripts() {
 		$has_purchase_links = true;
 	}
 
+	$in_footer = edd_scripts_in_footer();
+
 	if ( edd_is_checkout() ) {
 		if ( edd_is_cc_verify_enabled() ) {
-			wp_register_script( 'creditCardValidator', $js_dir . 'jquery.creditCardValidator' . $suffix . '.js', array( 'jquery' ), EDD_VERSION, true );
+			wp_register_script( 'creditCardValidator', $js_dir . 'jquery.creditCardValidator' . $suffix . '.js', array( 'jquery' ), EDD_VERSION, $in_footer );
+
+			// Registered so gateways can enqueue it when they support the space formatting. wp_enqueue_script( 'jQuery.payment' );
+			wp_register_script( 'jQuery.payment', $js_dir . 'jquery.payment.min.js', array( 'jquery' ), EDD_VERSION, $in_footer );
+
 			wp_enqueue_script( 'creditCardValidator' );
 		}
 
-		wp_register_script( 'edd-checkout-global', $js_dir . 'edd-checkout-global' . $suffix . '.js', array( 'jquery' ), EDD_VERSION, true );
+		wp_register_script( 'edd-checkout-global', $js_dir . 'edd-checkout-global' . $suffix . '.js', array( 'jquery' ), EDD_VERSION, $in_footer );
 		wp_enqueue_script( 'edd-checkout-global' );
 
 		wp_localize_script( 'edd-checkout-global', 'edd_global_vars', apply_filters( 'edd_global_checkout_script_vars', array(
@@ -71,7 +77,7 @@ function edd_load_scripts() {
 
 	// Load AJAX scripts, if enabled
 	if ( ! edd_is_ajax_disabled() ) {
-		wp_register_script( 'edd-ajax', $js_dir . 'edd-ajax' . $suffix . '.js', array( 'jquery' ), EDD_VERSION, true );
+		wp_register_script( 'edd-ajax', $js_dir . 'edd-ajax' . $suffix . '.js', array( 'jquery' ), EDD_VERSION, $in_footer );
 		wp_enqueue_script( 'edd-ajax' );
 
 		wp_localize_script( 'edd-ajax', 'edd_scripts', apply_filters( 'edd_ajax_script_vars', array(
@@ -214,6 +220,8 @@ function edd_load_admin_scripts( $hook ) {
 		'currency_sign'               => edd_currency_filter( '' ),
 		'currency_pos'                => edd_get_option( 'currency_position', 'before' ),
 		'currency_decimals'           => edd_currency_decimal_filter(),
+		'decimal_separator'           => edd_get_option( 'decimal_separator', '.' ),
+		'thousands_separator'         => edd_get_option( 'thousands_separator', ',' ),
 		'new_media_ui'                => apply_filters( 'edd_use_35_media_ui', 1 ),
 		'remove_text'                 => __( 'Remove', 'easy-digital-downloads' ),
 		'type_to_search'              => sprintf( __( 'Type to search %s', 'easy-digital-downloads' ), edd_get_label_plural() ),
@@ -360,3 +368,13 @@ function edd_load_head_styles() {
 	<?php
 }
 add_action( 'wp_head', 'edd_load_head_styles' );
+
+/**
+ * Determine if the frontend scripts should be loaded in the footer or header (default: footer)
+ *
+ * @since 2.8.6
+ * @return mixed
+ */
+function edd_scripts_in_footer() {
+	return apply_filters( 'edd_load_scripts_in_footer', true );
+}

@@ -581,10 +581,7 @@ function edd_downloads_query( $atts, $content = null ) {
 		<div class="edd_downloads_list <?php echo apply_filters( 'edd_downloads_list_wrapper_class', $wrapper_class, $atts ); ?>">
 			<?php while ( $downloads->have_posts() ) : $downloads->the_post(); ?>
 				<?php do_action( 'edd_download_shortcode_item', $atts, $i ); ?>
-				<?php if ( $atts['columns'] != 0 && $i % $atts['columns'] == 0 ) { ?><div style="clear:both;"></div><?php } ?>
 			<?php $i++; endwhile; ?>
-
-			<div style="clear:both;"></div>
 
 			<?php wp_reset_postdata(); ?>
 
@@ -935,7 +932,7 @@ function edd_process_profile_editor_remove_email() {
 
 		$user          = wp_get_current_user();
 		$user_login    = ! empty( $user->user_login ) ? $user->user_login : 'EDDBot';
-		$customer_note = __( sprintf( 'Email address %s removed by %s', $_GET['email'], $user_login ), 'easy-digital-downloads' );
+		$customer_note = sprintf( __( 'Email address %s removed by %s', 'easy-digital-downloads' ), sanitize_email( $_GET['email'] ), $user_login );
 		$customer->add_note( $customer_note );
 
 	} else {

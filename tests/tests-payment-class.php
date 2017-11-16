@@ -880,6 +880,7 @@ class Tests_Payment_Class extends EDD_UnitTestCase {
 		$payment = new EDD_Payment( $payment->ID );
 		$this->assertEquals( 1, $payment->cart_details[0]['discount'] );
 		$this->assertEquals( $original_total-1, $payment->cart_details[0]['price'] );
+		$this->assertSame( 1, $payment->discounted_amount );
 	}
 
 	public function modify_cart_item_tax() {
@@ -941,5 +942,21 @@ class Tests_Payment_Class extends EDD_UnitTestCase {
 	public function delete_meta_missing_key() {
 		$payment = new EDD_Payment( $this->_payment_id );
 		$this->assertFalse( $payment->delete_meta( '_edd_nonexistant_key' ) );
+	}
+
+	public function test_modify_amount() {
+		$payment = new EDD_Payment( $this->_payment_id );
+		$item_price = isset( $download['item_price'] ) ? $download['item_price'] : 0;
+
+
+		$args = array(
+			'item_price' => '1,001.95'
+		);
+
+		$payment->modify_cart_item( 0, $args );
+		$payment->save();
+
+		$payment = new EDD_Payment( $this->_payment_id );
+		$this->assertEquals( 1001.95, $payment->cart_details[0]['price'] );
 	}
 }
